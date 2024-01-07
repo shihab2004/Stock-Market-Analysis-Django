@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Yoo Analysis Stock</title>
+    <style>
+      .jin-event:hover{
+        color: red;
+        background-color: black;
+      }
+      #search-bar{
+        text-align: left !important;
+      }
+
+
+    .jin-event{
+          font-size: 13px;
+        }
+    </style>
+</head>
+<body class="bg-dark text-white">
+
+    <div class="container text-center my-3">
+        <h1>WELCOME TO National Stock Exchange</h1>
+        <h3>Analysis Your Favorite Stock</h3>
+    </div>
+
+
+    <div class="container  my-4">
+        
+        <h5 class="text-center">All market are available(NSE, BSE, NASDAQ, Bitcoin ...)  </h5>
+        
+    </div>
+    
+    <div class="container ">
+        <form class=" text-center my-5" method="post">
+            {% csrf_token %}
+
+            <input type="hidden" name="sym">
+
+           <div class="mb-3">
+              <label for="exampleInputEmail1" class="form-label">Search (symbol / company name / Index)</label>
+              <input type="text"  id="sym" name="sym__name" class="form-control" autocomplete="off">
+
+
+
+
+              <div class="container bg-white text-dark" id="search-bar">
+
+                
+                 
+                      <div class="row" style="border: 1px solid black;">
+
+                        <div class="col-5" class="sym__show">Symbol</div>
+                        <div class="col-5" class="name__show">Name</div>
+                        
+                      </div>
+
+                    <div id="search-data">
+
+                    </div>
+
+
+      
+
+
+              </div>
+            </div> 
+            
+
+            <script>
+               $("#search-bar").hide();
+
+                $("#sym").keyup((e)=>{
+                    var value =  $("#sym").val();
+                    console.log(value);
+                    $.ajax({
+                        method:"GET",
+                        url:`/api/${value}/`,
+                        
+                        success:(result)=>{
+                          var  html = ""
+                          result.sym.forEach(element => {
+                                html += `<div class="jin-event">
+                                              <div class="row">
+
+                                                  <div class="col-5 sym__show">${element.symbol}</div>
+                                                  <div class="col-5 name__show">${element.shortname}</div>
+
+                                              </div>
+
+                                          </div>
+                              `
+                          });
+
+                          $("#search-data").html(html);
+                        }
+                        
+                    })
+                })
+                $("#sym").focusout((e)=>{
+                  setTimeout(function(){
+                      $("#search-bar").hide()
+                  }, 300);
+                   
+                })
+                $("#sym").focusin((e)=>{
+                    $("#search-bar").show()
+                })
+
+                $("body").on("click",'.jin-event',(e)=>{
+
+                  console.log(e.currentTarget.querySelector(".sym__show").textContent);
+                  $("#sym").val(e.currentTarget.querySelector(".name__show").textContent)
+                  $("input[name='sym']").val(e.currentTarget.querySelector(".sym__show").textContent)
+                })
+            </script>
+
+
+
+
+
+
+
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">Analysis Days</label>
+              <input type="number" class="form-control" name="day" id="exampleInputPassword1">
+            </div>
+        
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">Time Frame</label>
+              <select name="timeframe" class="form-control">
+                <option value="1m">1 Minute</option>
+                <option value="2m">2 Minute</option>
+                <option value="5m" selected>5 Minute</option>
+                <option value="15m">15 Minute</option>
+                <option value="30m">30 Minute</option>
+                <option value="90m">90 Minute</option>
+                <option value="1h">1 Hour</option>
+                <option value="1d">1 Day</option>
+              </select>
+            </div>
+        
+            <button type="submit" class="btn btn-danger">Analysis</button>
+          </form>
+    </div>
+
+
+
+</body>
+</html>
